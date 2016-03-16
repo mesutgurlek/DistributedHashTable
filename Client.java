@@ -8,22 +8,7 @@ import java.net.Socket;
 import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * A simple Swing-based client for the chat server.  Graphically
- * it is a frame with a text field for entering messages and a
- * textarea to see the whole dialog.
- *
- * The client follows the Chat Protocol which is as follows.
- * When the server sends "SUBMITNAME" the client replies with the
- * desired screen name.  The server will keep sending "SUBMITNAME"
- * requests as long as the client submits screen names that are
- * already in use.  When the server sends a line beginning
- * with "NAMEACCEPTED" the client is now allowed to start
- * sending the server arbitrary strings to be broadcast to all
- * chatters connected to the server.  When the server sends a
- * line beginning with "MESSAGE " then all characters following
- * this string should be displayed in its message area.
- */
+
 public class Client {
 
     BufferedReader in;
@@ -41,14 +26,8 @@ public class Client {
     private String gettedKey;
     private String clientName;
     private Thread t, t2;
-    /**
-     * Constructs the client by laying out the GUI and registering a
-     * listener with the textfield so that pressing Return in the
-     * listener sends the textfield contents to the server.  Note
-     * however that the textfield is initially NOT editable, and
-     * only becomes editable AFTER the client receives the NAMEACCEPTED
-     * message from the server.
-     */
+
+
     public Client(String clientName, String serverAddress, int port) {
         this.port = port;
         this.serverAddress = serverAddress;
