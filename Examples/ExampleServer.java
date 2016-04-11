@@ -12,9 +12,9 @@ import java.util.Hashtable;
 public class Server {
     private static Hashtable<String, PrintWriter> namePrinterTable = new Hashtable();
     private static Hashtable<String, Integer> serverHashTable = new Hashtable<String, Integer>();
-    private static int clientSize = 0;
+    private static Integer clientSize = 0;
     private static String serverAdd;
-    private static final int PORT = 9001;
+    private static String port;
     /**
      * The set of all names of clients in the room so that we can check that new clients are not registering name
      * already in use.
@@ -32,8 +32,10 @@ public class Server {
      * spawns handler threads.
      */
     public static void main(String[] args) throws Exception {
-        SSystem.out.println("The server is running.");
-        ServerSocket listener = new ServerSocket(PORT);
+        System.out.println("The server is running.");
+        port = args[0];
+        serverAdd = InetAddress.getLocalHost().toString();
+        ServerSocket listener = new ServerSocket(Integer.parseInt(args[0]));
         try {
             while (true) {
                 new Handler(listener.accept()).start();
@@ -61,7 +63,6 @@ public class Server {
         public Handler(Socket socket) {
             this.socket = socket;
         }
-
 
         public void run() {
             try {
@@ -91,7 +92,9 @@ public class Server {
 
                 //Put names and printers to tables
                 namePrinterTable.put(name, out);
-                clientSize++;
+                synchronized (clientSize){
+                    clientSize++;
+                }
 
                 for(PrintWriter writer : writers){
                     writer.println("MESSAGE " + "returnsize " + clientSize);
@@ -106,23 +109,25 @@ public class Server {
                     }
                     String[] str = input.split(" ");
 
-                    if(str[0].equals("putkey")){
-                        serverHashTable.put(str[1], Integer.parseInt(str[2]));
-                        System.err.println("[" + serverAdd + "]" + " put: " + str[1] + " : " + Integer.parseInt(str[2]));
-                    }
-                    else if(str[0].equals("getsize")){
-                        PrintWriter writer = namePrinterTable.get(name);
-                        writer.println("MESSAGE " + "returnsize " + clientSize);
-                    }
-                    else if(str[0].equals("getkey")){
-                        String clientName = str[1];
-                        System.err.println("[" + serverAdd + ":" + port + "]" + " : " + " get:" + str[2] + " : " + serverHashTable.get(str[2]));
-                        PrintWriter writer = namePrinterTable.get(clientName);
-                        writer.println("MESSAGE " + "getkey " + str[2] + " " + serverHashTable.get(str[2]) + " " + serverAdd);
-                    }
-                    else{
-                        for (PrintWriter writer : writers) {
-                            writer.println("MESSAGE " + name + ": " + input + " " + clientSize);
+                    synchronized (str[0]){
+                        if(str[0].equals("putkey")){
+                            serverHashTable.put(str[1], Integer.parseInt(str[2]));
+                            System.err.println("[" + serverAdd + "]" + " put: " + str[1] + " : " + Integer.parseInt(str[2]));
+                        }
+                        else if(str[0].equals("getsize")){
+                            PrintWriter writer = namePrinterTable.get(name);
+                            writer.println("MESSAGE " + "returnsize " + clientSize);
+                        }
+                        else if(str[0].equals("getkey")){
+                            String clientName = str[1];
+                            System.err.println("[" + serverAdd + ":" + port + "]" + " : " + " get:" + str[2] + " : " + serverHashTable.get(str[2]));
+                            PrintWriter writer = namePrinterTable.get(clientName);
+                            writer.println("MESSAGE " + "getkey " + str[2] + " " + serverHashTable.get(str[2]) + " " + serverAdd + " " + port);
+                        }
+                        else{
+                            for (PrintWriter writer : writers) {
+                                writer.println("MESSAGE " + name + ": " + input + " " + clientSize);
+                            }
                         }
                     }
                 }

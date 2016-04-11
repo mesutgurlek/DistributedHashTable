@@ -44,6 +44,50 @@ public class Client {
         wait = new AtomicBoolean(true);
     }
 
+    public static void main(String[] args) throws Exception {
+        String name = "";
+        if(args.length > 0)
+            name = args[0];
+        Client c = new Client(name);
+        Scanner scanner = new Scanner(System.in);
+        String ans = "Y";
+        do{
+            System.out.println("Do you wanna add server?('Y' or 'N')");
+            String line = scanner.nextLine();
+            String[] command = line.split(" ");
+            if(command.length == 0)
+                System.out.println("Please enter a valid command!");
+            else if(command[0].equalsIgnoreCase("y")){
+                ans = command[0];
+                System.out.print("Enter Server Address: " );
+                String address = scanner.nextLine();
+                System.out.print("Enter Port: " );
+                String port = scanner.nextLine();
+                c.addServer(address, Integer.parseInt(port));
+            }
+            else if(command[0].equalsIgnoreCase("n")){
+                ans = command[0];
+            }
+        }while(ans.equalsIgnoreCase("y"));
+
+        String line = scanner.nextLine();
+        String[] command = line.split(" ");
+        System.out.println(line);
+        while(!command[0].equals("exit")){
+            if(command[0].equals("get")){
+                int res = c.getKey(command[1]);
+            }else if(command[0].equals("put")){
+                c.putKey(command[1], command[2]);
+            }
+            else{
+                System.out.println(line);
+                    }
+            line = scanner.nextLine();
+            command = line.split(" ");
+        }
+
+    }
+
     public void addServer(String serverAddress, int port){
         serverSize++;
         ServerStruct s = new ServerStruct(serverSize, serverAddress, port);
@@ -120,8 +164,8 @@ public class Client {
                         if(str.length == 3 && str[1].equals("returnsize")){
                             clientSize = Integer.parseInt(str[2]);
                         }
-                        else if(str.length == 5 && str[1].equals("getkey")){
-                            System.err.println("[" + str[4] + "]" + " key: " + str[2] + " value: " + str[3] + "\n");
+                        else if(str.length == 6 && str[1].equals("getkey")){
+                            System.err.println("[" + str[4] + ":" + str[5] + "]" + " key: " + str[2] + ", value: " + str[3] + "\n");
                             gettedValue = Integer.parseInt(str[3]);
                             wait.set(false);
                         }
