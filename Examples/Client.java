@@ -73,15 +73,15 @@ public class Client {
         String line = scanner.nextLine();
         String[] command = line.split(" ");
         System.out.println(line);
-        while(!command[0].equals("exit")){
+        while(command.length == 2 && !command[0].equals("exit")){
             if(command[0].equals("get")){
                 int res = c.getKey(command[1]);
-            }else if(command[0].equals("put")){
+            }else if(command.length == 3 && command[0].equals("put")){
                 c.putKey(command[1], command[2]);
             }
             else{
-                System.out.println(line);
-                    }
+                System.out.println("Wrong Command!!");
+            }
             line = scanner.nextLine();
             command = line.split(" ");
         }
